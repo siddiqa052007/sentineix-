@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+}
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: -0.011em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* Headings: Space Grotesk Bold (700) */
+h1, h2, h3, h4, h5, h6, .heading-1, .heading-2, .heading-3, .font-heading {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+/* Navigation: Space Grotesk SemiBold (600) */
+nav, header, aside nav, .nav-item, [role="navigation"] {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+nav a, nav button, aside nav button {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+  font-weight: 600 !important;
+}
+
+/* Buttons: Space Grotesk Medium (500) */
+button, .btn, [role="button"] {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.01em;
+}
+
+/* Cards: Inter Font for Card Container & Body Text */
+.glass-card, .card, [role="article"] {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* Preserve Space Grotesk for Headings and Buttons inside Cards */
+.glass-card h1, .glass-card h2, .glass-card h3, .glass-card h4, .glass-card h5, .glass-card h6 {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+  font-weight: 700 !important;
+}
+
+.glass-card button {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+  font-weight: 500 !important;
+}
+
+/* Body & Paragraph Text: Inter Font */
+p, span, td, th, input, select, textarea, label {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+@layer utilities {
+  .bg-cyber-grid {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  }
+
+  .bg-cyber-dots {
+    background-image: radial-gradient(rgba(0, 240, 255, 0.15) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .glass-card {
+    background: rgba(10, 15, 29, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-card-hover {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-card-hover:hover {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(0, 240, 255, 0.3);
+    box-shadow: 0 0 25px -5px rgba(0, 240, 255, 0.15);
+  }
+
+  .text-glow-cyan {
+    text-shadow: 0 0 12px rgba(0, 240, 255, 0.6);
+  }
+
+  .text-glow-emerald {
+    text-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+  }
+
+  .glow-box-cyan {
+    box-shadow: 0 0 30px -5px rgba(0, 240, 255, 0.25);
+  }
+
+  .glow-box-rose {
+    box-shadow: 0 0 30px -5px rgba(244, 63, 94, 0.25);
+  }
+}
+
+@keyframes radar-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-radar-sweep {
+  animation: radar-sweep 4s linear infinite;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(1000%);
+  }
+}
+
+.animate-scanline {
+  animation: scanline 8s linear infinite;
+}
+
+/* Custom scrollbars for cyber code & terminal views */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(8, 12, 22, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.5);
+}
+

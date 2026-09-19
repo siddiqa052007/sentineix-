@@ -1,0 +1,20 @@
+[
+  {
+    "ip": "198.51.100.42",
+    "blockedAt": "Yesterday 04:30 PM",
+    "reason": "XSS attack origin IP blackholed at perimeter WAF",
+    "threatId": "TRT-1007"
+  },
+  {
+    "ip": "198.51.100.120",
+    "blockedAt": "Yesterday 01:25 PM",
+    "reason": "Directory traversal attempt source IP blocked",
+    "threatId": "TRT-1012"
+  },
+  {
+    "ip": "198.51.100.222",
+    "blockedAt": "2 days ago",
+    "reason": "SSH brute force sweep origin IP banned",
+    "threatId": "TRT-1015"
+  }
+]

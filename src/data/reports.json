@@ -1,0 +1,160 @@
+[
+  {
+    "id": "REP-8001",
+    "threatId": "TRT-1007",
+    "threatName": "Cross-Site Scripting (XSS) Injection",
+    "reportType": "Daily",
+    "severity": "Medium",
+    "affectedDevice": "web-frontend-cluster",
+    "generatedBy": "SecOps AI Automated",
+    "generatedTime": "Yesterday, 04:30 PM",
+    "resolutionTime": "Yesterday, 04:30 PM",
+    "resolvedBy": "Admin",
+    "method": "Sanitized HTML response output and updated CSP header rules.",
+    "status": "Resolved",
+    "dateRange": "Jul 26, 2026",
+    "executiveSummary": {
+      "currentSecurityPosture": "Good. Ingress web application firewall successfully neutralized reflected payload targeting client session tokens.",
+      "mostCriticalIncident": "Reflected XSS attempt on /api/user/profile parameters from IP 185.220.101.5.",
+      "riskAssessment": "Low residual risk following CSP header hardening and HTML input encoding enforcement.",
+      "recommendations": [
+        "Audit secondary input fields across customer portal",
+        "Maintain strict Content-Security-Policy script-src directives",
+        "Perform quarterly SAST vulnerability scans"
+      ]
+    },
+    "snapshot": {
+      "securityScore": 92,
+      "activeThreatsCount": 2,
+      "resolvedThreatsCount": 14,
+      "criticalIncidentsCount": 0,
+      "quarantinedDevicesCount": 1,
+      "blockedIpsCount": 5,
+      "totalDevicesCount": 18
+    },
+    "details": {
+      "description": "Reflected cross-site scripting attack vector detected in Web Application Firewall telemetry.",
+      "protocol": "HTTPS (443)",
+      "sourceIp": "185.220.101.5",
+      "destination": "web-frontend-cluster",
+      "businessImpacts": [
+        "Potential session token hijacking if unmitigated",
+        "Risk of unauthorized DOM manipulation on client browser"
+      ],
+      "actionsTaken": [
+        "Sanitized HTML response output",
+        "Updated Content-Security-Policy (CSP) headers",
+        "Blocked origin IP address"
+      ],
+      "recommendations": [
+        "Enforce automated input sanitization across all public endpoints",
+        "Enable HttpOnly and SameSite attributes on session cookies"
+      ]
+    }
+  },
+  {
+    "id": "REP-8002",
+    "threatId": "TRT-1012",
+    "threatName": "Directory Traversal Attack",
+    "reportType": "Daily",
+    "severity": "High",
+    "affectedDevice": "app-server-02",
+    "generatedBy": "SecOps AI Automated",
+    "generatedTime": "Yesterday, 01:25 PM",
+    "resolutionTime": "Yesterday, 01:25 PM",
+    "resolvedBy": "Admin",
+    "method": "Enforced strict path normalization on file download endpoints.",
+    "status": "Resolved",
+    "dateRange": "Jul 26, 2026",
+    "executiveSummary": {
+      "currentSecurityPosture": "Stable. Endpoint directory path traversal attempts blocked at API gateway.",
+      "mostCriticalIncident": "Attempted file path manipulation targeting /etc/passwd on app-server-02.",
+      "riskAssessment": "Zero data leakage observed; strict chroot jail prevented directory escape.",
+      "recommendations": [
+        "Implement explicit URI allowlists for download handlers",
+        "Restrict OS user permissions for web application service accounts",
+        "Monitor file read syscall logs via eBPF"
+      ]
+    },
+    "snapshot": {
+      "securityScore": 88,
+      "activeThreatsCount": 3,
+      "resolvedThreatsCount": 13,
+      "criticalIncidentsCount": 1,
+      "quarantinedDevicesCount": 1,
+      "blockedIpsCount": 4,
+      "totalDevicesCount": 18
+    },
+    "details": {
+      "description": "Directory traversal payload containing sequence relative path escaping was intercepted.",
+      "protocol": "HTTP (8080)",
+      "sourceIp": "194.26.29.114",
+      "destination": "app-server-02",
+      "businessImpacts": [
+        "Unauthorized file disclosure risk",
+        "System configuration file exposure"
+      ],
+      "actionsTaken": [
+        "Enforced strict path canonicalization",
+        "Isolated app process user sandbox"
+      ],
+      "recommendations": [
+        "Remove direct filesystem path passing in URL parameters",
+        "Use UUID keys for file download maps"
+      ]
+    }
+  },
+  {
+    "id": "REP-8003",
+    "threatId": "TRT-1015",
+    "threatName": "SSH Key Password Brute Sweep",
+    "reportType": "Weekly",
+    "severity": "Critical",
+    "affectedDevice": "bastion-host-01",
+    "generatedBy": "SecOps AI Automated",
+    "generatedTime": "2 days ago",
+    "resolutionTime": "2 days ago",
+    "resolvedBy": "Admin",
+    "method": "Permanently blackholed source IP via Fail2Ban ingress firewall.",
+    "status": "Archived",
+    "dateRange": "Jul 20 - Jul 25, 2026",
+    "executiveSummary": {
+      "currentSecurityPosture": "Hardened. Perimeter SSH probes successfully mitigated by automated fail2ban ingress policy.",
+      "mostCriticalIncident": "Automated brute-force SSH probe executing 2,400 attempts/min against port 22.",
+      "riskAssessment": "No compromised credentials. SSH root login disabled and pubkey auth strictly enforced.",
+      "recommendations": [
+        "Migrate SSH access to Zero-Trust WireGuard / Teleport bastion tunnel",
+        "Enforce IP geo-fencing for administrative shell connections",
+        "Rotate all SSH host keys quarterly"
+      ]
+    },
+    "snapshot": {
+      "securityScore": 85,
+      "activeThreatsCount": 4,
+      "resolvedThreatsCount": 12,
+      "criticalIncidentsCount": 2,
+      "quarantinedDevicesCount": 2,
+      "blockedIpsCount": 8,
+      "totalDevicesCount": 18
+    },
+    "details": {
+      "description": "High-velocity SSH password guessing attack targeting bastion host.",
+      "protocol": "SSH (22)",
+      "sourceIp": "45.142.120.88",
+      "destination": "bastion-host-01",
+      "businessImpacts": [
+        "Potential administrative credential compromise",
+        "High CPU consumption on SSH daemon"
+      ],
+      "actionsTaken": [
+        "IP blackholed at eBPF layer",
+        "Fail2ban rule trigger recorded",
+        "SSH daemon re-configured for key-only access"
+      ],
+      "recommendations": [
+        "Disable public port 22 binding",
+        "Require multi-factor authentication for SSH sessions"
+      ]
+    }
+  }
+]

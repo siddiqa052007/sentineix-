@@ -1,0 +1,190 @@
+[
+  {
+    "id": "TRT-1004",
+    "title": "Brute Force Attack",
+    "severity": "Critical",
+    "status": "Active",
+    "sourceIp": "192.168.1.24",
+    "destination": "Authentication Server",
+    "detectedAt": "10:20 AM",
+    "protocol": "HTTPS",
+    "riskScore": 96,
+    "description": "This attack consists of repeated failed login attempts from the same source IP within a short period of time. The pattern strongly indicates an automated password guessing attempt targeting root and admin accounts.",
+    "businessImpacts": [
+      "Unauthorized account access & privilege escalation",
+      "Credential compromise across authentication tokens",
+      "Service disruption due to rate limit triggers & resource exhaustion"
+    ],
+    "recommendedActions": [
+      { "id": "act-1", "text": "Block Source IP (192.168.1.24) at ingress WAF", "completed": false },
+      { "id": "act-2", "text": "Enable Multi-Factor Authentication (MFA) for target accounts", "completed": true },
+      { "id": "act-3", "text": "Review authentication logs for breached session tokens", "completed": false },
+      { "id": "act-4", "text": "Reset affected passwords and invalidate active JWTs", "completed": false }
+    ],
+    "timeline": [
+      { "time": "10:18 AM", "title": "Multiple login attempts detected", "desc": "140 failed requests/sec flagged" },
+      { "time": "10:20 AM", "title": "Brute Force identified", "desc": "Pattern matched automated dictionary payload" },
+      { "time": "10:21 AM", "title": "Alert generated", "desc": "SentinelX SOC high-priority notification triggered" },
+      { "time": "10:23 AM", "title": "Security engineer notified", "desc": "Dispatched to SecOps primary on-call group" }
+    ],
+    "aiAnalysis": {
+      "explanation": "This attack attempts to guess passwords by repeatedly trying multiple combinations against the authentication gateway within a compressed timeframe.",
+      "businessImpact": "User accounts may be compromised, leading to unauthorized data exfiltration or lateral movement.",
+      "recommendedResponse": "Immediately block the source IP at the network boundary. Force MFA re-validation and audit failed login audit trails.",
+      "futurePrevention": [
+        "Implement adaptive rate limiting on /api/auth endpoints.",
+        "Enforce stronger zero-trust password policies.",
+        "Monitor real-time authentication log telemetry via eBPF."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1001",
+    "title": "SQL Injection Attack",
+    "severity": "Critical",
+    "status": "Active",
+    "sourceIp": "185.220.101.5",
+    "destination": "auth-service-pod",
+    "detectedAt": "14:32 PM",
+    "protocol": "HTTP/2",
+    "riskScore": 92,
+    "description": "Interception of UNION SELECT payload attempting to dump admin credentials and bypass authentication routines on database endpoints.",
+    "businessImpacts": [
+      "Database breach & confidential user data leakage",
+      "Unauthorized record modification & schema tampering",
+      "Compliance audit violation under HIPAA & SOC2 standards"
+    ],
+    "recommendedActions": [
+      { "id": "sql-1", "text": "Quarantine source IP (185.220.101.5) at eBPF xdp layer", "completed": true },
+      { "id": "sql-2", "text": "Enforce parameterized SQL prepared statements across API endpoints", "completed": false },
+      { "id": "sql-3", "text": "Audit database user permissions and restrict table grants", "completed": false }
+    ],
+    "timeline": [
+      { "time": "14:30 PM", "title": "Malicious SQL payload detected", "desc": "UNION SELECT signature matched in request body" },
+      { "time": "14:31 PM", "title": "WAF eBPF filter triggered", "desc": "Connection dropped prior to database arrival" },
+      { "time": "14:32 PM", "title": "IP blacklisted", "desc": "Added to edge firewall blocklist" }
+    ],
+    "aiAnalysis": {
+      "explanation": "An attacker sent a crafted HTTP request with SQL syntax to exploit string concatenation vulnerability in backend database query execution.",
+      "businessImpact": "Unrestricted database access could expose sensitive user PII and internal configuration secrets.",
+      "recommendedResponse": "Immediately ensure all ORM queries use parameterized bindings. Verify input validation on all auth endpoints.",
+      "futurePrevention": [
+        "Use strict input sanitization libraries.",
+        "Run daily automated SAST/DAST vulnerability scans.",
+        "Enforce least-privilege database user access roles."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1002",
+    "title": "DDoS SYN Flood",
+    "severity": "High",
+    "status": "Active",
+    "sourceIp": "45.148.10.22",
+    "destination": "ingress-gateway-01",
+    "detectedAt": "14:30 PM",
+    "protocol": "TCP/SYN",
+    "riskScore": 88,
+    "description": "High-density TCP connection handshake flood attempting to exhaust kernel socket buffers and ingress load balancer bandwidth.",
+    "businessImpacts": [
+      "Ingress network saturation and packet queue delay",
+      "Increased latency spikes for legitimate customer requests",
+      "Risk of node crash due to kernel memory exhaustion"
+    ],
+    "recommendedActions": [
+      { "id": "ddos-1", "text": "Enable eBPF SYN cookie challenge filter", "completed": true },
+      { "id": "ddos-2", "text": "Activate Anycast BGP rate limiter across edge PoPs", "completed": true },
+      { "id": "ddos-3", "text": "Blackhole offending subnet range at tier-1 provider", "completed": false }
+    ],
+    "timeline": [
+      { "time": "14:28 PM", "title": "Ingress bandwidth spike detected", "desc": "2.45M pps SYN packet volume flagged" },
+      { "time": "14:29 PM", "title": "eBPF SYN cookie filter engaged", "desc": "Automatic stateless handshake validation active" },
+      { "time": "14:30 PM", "title": "SYN traffic challenge active", "desc": "Non-validated handshakes dropped" }
+    ],
+    "aiAnalysis": {
+      "explanation": "Distributed botnet nodes flooded ingress gateways with TCP SYN packets without responding to SYN-ACK, aiming to fill connection tables.",
+      "businessImpact": "Server unresponsiveness and temporary outage for external web traffic if unmitigated.",
+      "recommendedResponse": "Maintain SYN cookie mode at kernel level. Monitor edge BGP telemetry for secondary attack waves.",
+      "futurePrevention": [
+        "Configure hardware-accelerated XDP packet drop rules.",
+        "Distribute load across multi-region edge gateways.",
+        "Set lower TCP connection timeout limits."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1003",
+    "title": "Zero-Day RCE Probe",
+    "severity": "Critical",
+    "status": "Active",
+    "sourceIp": "198.51.100.89",
+    "destination": "api-gateway-03",
+    "detectedAt": "14:28 PM",
+    "protocol": "HTTPS",
+    "riskScore": 98,
+    "description": "Anomalous HTTP POST request containing serialized object payload attempting remote code execution in container runtime environment.",
+    "businessImpacts": [
+      "Container breakout and host infrastructure takeover",
+      "Arbitrary code execution with elevated root privileges",
+      "Lateral movement to internal Kubernetes cluster nodes"
+    ],
+    "recommendedActions": [
+      { "id": "rce-1", "text": "Isolate container pod (api-gateway-03) immediately", "completed": true },
+      { "id": "rce-2", "text": "Patch deserialization library dependency", "completed": false },
+      { "id": "rce-3", "text": "Export memory forensic dump for malware analysis", "completed": false }
+    ],
+    "timeline": [
+      { "time": "14:26 PM", "title": "Heap allocation anomaly flagged", "desc": "Unusual process spawn attempt in sandbox" },
+      { "time": "14:27 PM", "title": "RCE signature intercepted", "desc": "eBPF syscall monitor blocked execve()" },
+      { "time": "14:28 PM", "title": "Alert dispatched to SOC", "desc": "Network policies sandbox container" }
+    ],
+    "aiAnalysis": {
+      "explanation": "An attacker attempted to pass a malicious payload that triggers arbitrary shell command execution during object deserialization.",
+      "businessImpact": "Full host system compromise, potential access to cloud service keys and customer databases.",
+      "recommendedResponse": "Keep the pod isolated. Re-deploy patched image from secure CI/CD pipeline.",
+      "futurePrevention": [
+        "Disable dynamic code execution in runtime containers.",
+        "Enforce read-only container root file systems.",
+        "Use eBPF runtime security agents like Falco or SentinelX."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1005",
+    "title": "XSS Cookie Exfiltration",
+    "severity": "Medium",
+    "status": "Resolved",
+    "sourceIp": "103.224.182.1",
+    "destination": "web-frontend-02",
+    "detectedAt": "09:15 AM",
+    "resolvedAt": "09:30 AM",
+    "protocol": "HTTPS",
+    "riskScore": 65,
+    "description": "Cross-site scripting payload injection attempting to read Document.cookie and exfiltrate session keys to external C2 server.",
+    "businessImpacts": [
+      "User session hijacking and cookie theft",
+      "Account takeover for logged-in active users",
+      "Cross-origin security policy violation"
+    ],
+    "recommendedActions": [
+      { "id": "xss-1", "text": "Enforce HttpOnly and SameSite=Strict flags on all session cookies", "completed": true },
+      { "id": "xss-2", "text": "Update Content-Security-Policy (CSP) headers", "completed": true },
+      { "id": "xss-3", "text": "Sanitize client-side innerHTML rendering components", "completed": true }
+    ],
+    "timeline": [
+      { "time": "09:15 AM", "title": "DOM injection payload received", "desc": "<script> tag detected in form field" },
+      { "time": "09:20 AM", "title": "WAF filter sanitized output", "desc": "HTML entity encoding applied automatically" },
+      { "time": "09:30 AM", "title": "Marked as Resolved", "desc": "Session cookies secured with HttpOnly flag" }
+    ],
+    "aiAnalysis": {
+      "explanation": "Reflected cross-site scripting payload attempted to execute malicious JavaScript in user browsers to read auth cookies.",
+      "businessImpact": "Targeted account compromise if users visit un-sanitized pages.",
+      "recommendedResponse": "Set HttpOnly on sensitive cookies so script cannot access them. Restrict CSP script sources.",
+      "futurePrevention": [
+        "Enforce contextual output encoding in frontend templates.",
+        "Implement strict Content-Security-Policy (CSP).",
+        "Use automated AST vulnerability scanners in pull requests."
+      ]
+    }
+  }
+]

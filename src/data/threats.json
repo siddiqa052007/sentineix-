@@ -1,0 +1,1116 @@
+[
+  {
+    "id": "TRT-1001",
+    "title": "Brute Force Authentication Attack",
+    "severity": "Critical",
+    "status": "Active",
+    "sourceIp": "10.0.1.15",
+    "destination": "auth-primary-node01",
+    "deviceName": "auth-primary-node01",
+    "deviceId": "DEV-1001",
+    "detectedAt": "10:20 AM (Just now)",
+    "protocol": "HTTPS (443)",
+    "riskScore": 96,
+    "description": "High-frequency credential stuffing attack targeting primary authentication server node.",
+    "businessImpacts": [
+      "Unauthorized account compromise",
+      "Authentication service degradation"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Block Source IP (192.168.1.24) at ingress WAF",
+        "completed": false
+      },
+      {
+        "id": "act-2",
+        "text": "Enable Multi-Factor Authentication (MFA) for target accounts",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "10:18 AM",
+        "title": "High failed login rate",
+        "desc": "140 requests/sec flagged"
+      },
+      {
+        "time": "10:20 AM",
+        "title": "IP rate limit enforced",
+        "desc": "Added to ban list"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Automated botnet attempting dictionary password matching.",
+      "businessImpact": "Account breach risks.",
+      "recommendedResponse": "Enforce strict IP blacklisting and rate limits.",
+      "futurePrevention": [
+        "Mandate MFA across all accounts."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1002",
+    "title": "Cloud Metadata SSRF Probe",
+    "severity": "High",
+    "status": "Active",
+    "sourceIp": "10.0.1.20",
+    "destination": "k8s-ingress-gateway",
+    "deviceName": "k8s-ingress-gateway",
+    "deviceId": "DEV-1002",
+    "detectedAt": "11:05 AM (Just now)",
+    "protocol": "HTTP/2 (8080)",
+    "riskScore": 84,
+    "description": "Attempted Server-Side Request Forgery (SSRF) targeting internal AWS IMDSv1 cloud metadata endpoint (169.254.169.254) to harvest IAM role credentials.",
+    "businessImpacts": [
+      "Exposing cloud infrastructure credentials",
+      "Potential lateral movement across AWS account resources",
+      "Bypassing perimeter security controls"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Block access to 169.254.169.254 via iptables / eBPF rules",
+        "completed": true
+      },
+      {
+        "id": "act-2",
+        "text": "Upgrade Cloud Metadata service to IMDSv2 (Token Required)",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "11:00 AM",
+        "title": "SSRF payload detected",
+        "desc": "Request URL redirected to internal IP"
+      },
+      {
+        "time": "11:05 AM",
+        "title": "Access Blocked",
+        "desc": "IMDS access attempt dropped by firewall"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Request forged to query internal metadata service for temporary AWS keys.",
+      "businessImpact": "Potential cloud account escalation if IAM role keys are leaked.",
+      "recommendedResponse": "Enforce IMDSv2 requiring session token headers.",
+      "futurePrevention": [
+        "Enforce strict egress URL allowlisting."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1003",
+    "title": "PostgreSQL Data Exfiltration Attack",
+    "severity": "Critical",
+    "status": "Active",
+    "sourceIp": "10.0.2.105",
+    "destination": "db-pg-cluster-master",
+    "deviceName": "db-pg-cluster-master",
+    "deviceId": "DEV-1003",
+    "detectedAt": "14:32 PM (Just now)",
+    "protocol": "PostgreSQL (5432)",
+    "riskScore": 95,
+    "description": "Interception of unauthorized SQL queries attempting to dump administrative database tables and customer PII records from master database cluster.",
+    "businessImpacts": [
+      "Database breach & confidential user data leakage",
+      "Unauthorized record modification & schema tampering",
+      "Compliance audit violation under HIPAA & SOC2 standards"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Apply web application firewall (WAF) SQLi rule block",
+        "completed": false
+      },
+      {
+        "id": "act-2",
+        "text": "Sanitize and parameterize ORM query inputs in API controller",
+        "completed": true
+      },
+      {
+        "id": "act-3",
+        "text": "Audit recent database query logs for suspicious UNION payloads",
+        "completed": false
+      }
+    ],
+    "timeline": [
+      {
+        "time": "14:30 PM",
+        "title": "Malicious SQL payload detected",
+        "desc": "UNION SELECT signature matched in request body"
+      },
+      {
+        "time": "14:31 PM",
+        "title": "WAF eBPF filter triggered",
+        "desc": "Connection dropped prior to database arrival"
+      },
+      {
+        "time": "14:32 PM",
+        "title": "IP blacklisted",
+        "desc": "Added to edge firewall blocklist"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "An attacker sent crafted HTTP requests with SQL syntax to dump administrative tables.",
+      "businessImpact": "Unrestricted database access could expose sensitive user PII.",
+      "recommendedResponse": "Immediately ensure all ORM queries use parameterized bindings.",
+      "futurePrevention": [
+        "Use strict input sanitization libraries.",
+        "Run daily automated SAST/DAST vulnerability scans."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1004",
+    "title": "Unverified USB Drive Insertion Event",
+    "severity": "Low",
+    "status": "Active",
+    "sourceIp": "192.168.4.12",
+    "destination": "workstation-ceo-mac",
+    "deviceName": "workstation-ceo-mac",
+    "deviceId": "DEV-1004",
+    "detectedAt": "10:15 AM (Just now)",
+    "protocol": "USB OTG",
+    "riskScore": 25,
+    "description": "Removable USB mass storage drive plugged into endpoint without digital signature approval.",
+    "businessImpacts": [
+      "Potential physical malware delivery vector"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Automated USB device read lock enforced",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "10:15 AM",
+        "title": "USB Mount Blocked",
+        "desc": "SentinelX endpoint agent blocked mount request"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Unregistered mass storage device blocked by endpoint DLP policy.",
+      "businessImpact": "Zero impact due to automatic policy block.",
+      "recommendedResponse": "Verify USB hardware serial with IT department.",
+      "futurePrevention": [
+        "Enforce USB device hardware allowlists."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1005",
+    "title": "Outdated Shell Utility Security Warning",
+    "severity": "Low",
+    "status": "Under Investigation",
+    "sourceIp": "192.168.10.4",
+    "destination": "sec-ops-terminal-01",
+    "deviceName": "sec-ops-terminal-01",
+    "deviceId": "DEV-1005",
+    "detectedAt": "11:20 AM (Just now)",
+    "protocol": "Local Shell",
+    "riskScore": 20,
+    "description": "Terminal utility binary version flagged as outdated during daily vulnerability compliance sweep.",
+    "businessImpacts": [
+      "Minor patch compliance drift"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Update local shell packages via pacman / apt",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "11:20 AM",
+        "title": "Package update installed",
+        "desc": "Latest security patch applied"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Non-critical patch update recommendation.",
+      "businessImpact": "None.",
+      "recommendedResponse": "Maintain automated package patch schedule.",
+      "futurePrevention": [
+        "Enable automated daily patch updates."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1006",
+    "title": "Unauthorized Sudo Privilege Escalation",
+    "severity": "High",
+    "status": "Active",
+    "sourceIp": "10.0.3.50",
+    "destination": "fin-erp-app-server",
+    "deviceName": "fin-erp-app-server",
+    "deviceId": "DEV-1006",
+    "detectedAt": "08:14 AM (1 min ago)",
+    "protocol": "SSH (22)",
+    "riskScore": 88,
+    "description": "Execution of suspicious sudo commands attempting local privilege escalation on financial ERP application host.",
+    "businessImpacts": [
+      "Unrestricted administrative access to financial records",
+      "Risk of arbitrary binary execution"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Revoke active SSH session for user service-acc-fin",
+        "completed": true
+      },
+      {
+        "id": "act-2",
+        "text": "Audit /etc/sudoers file for wildcards and insecure permissions",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "08:10 AM",
+        "title": "Sudo command flagged",
+        "desc": "Anomalous execution of sudo su - root"
+      },
+      {
+        "time": "08:14 AM",
+        "title": "Session Terminated",
+        "desc": "SSH process killed by eBPF agent"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "A low-privileged user account attempted to invoke root privileges without authorization.",
+      "businessImpact": "Risk of unauthorized modification of ledger records.",
+      "recommendedResponse": "Audit sudoers configuration and require MFA for sudo privileges.",
+      "futurePrevention": [
+        "Implement privilege access management (PAM)."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1007",
+    "title": "Phishing Credential Harvesting Attempt",
+    "severity": "Medium",
+    "status": "Under Investigation",
+    "sourceIp": "10.0.4.18",
+    "destination": "hr-portal-web-pod-a",
+    "deviceName": "hr-portal-web-pod-a",
+    "deviceId": "DEV-1007",
+    "detectedAt": "12:10 PM (Just now)",
+    "protocol": "HTTPS (443)",
+    "riskScore": 62,
+    "description": "Internal user received spoofed HR notification link containing external redirect URL.",
+    "businessImpacts": [
+      "Potential HR portal credential disclosure"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Revoke active O365 user tokens for targeted employee",
+        "completed": false
+      },
+      {
+        "id": "act-2",
+        "text": "Block domain login-microsoft-secure.com at Secure Web Gateway",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "12:05 PM",
+        "title": "Malicious link flagged",
+        "desc": "Domain age under 3 days"
+      },
+      {
+        "time": "12:10 PM",
+        "title": "Gateway blocked URL",
+        "desc": "Redirect prevented"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Targeted phishing campaign delivering fake login page.",
+      "businessImpact": "Potential HR account takeover.",
+      "recommendedResponse": "Reset user session tokens and alert security team.",
+      "futurePrevention": [
+        "Conduct security awareness training."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1008",
+    "title": "API Parameter Abuse & Rate Limit Breach",
+    "severity": "Medium",
+    "status": "Active",
+    "sourceIp": "10.0.1.88",
+    "destination": "customer-api-01",
+    "deviceName": "customer-api-01",
+    "deviceId": "DEV-1008",
+    "detectedAt": "09:15 AM (2 mins ago)",
+    "protocol": "HTTP/2 (443)",
+    "riskScore": 58,
+    "description": "High volume of API calls exceeding tier threshold on customer data endpoint.",
+    "businessImpacts": [
+      "API latency increase for normal users"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Sanitize HTML response output in API gateway",
+        "completed": true
+      },
+      {
+        "id": "act-2",
+        "text": "Update Content Security Policy (CSP) headers",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "09:10 AM",
+        "title": "Rate limit exceeded",
+        "desc": "1,200 req/min from single token"
+      },
+      {
+        "time": "09:15 AM",
+        "title": "Throttling applied",
+        "desc": "HTTP 429 Too Many Requests returned"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Automated script polling API without exponential backoff.",
+      "businessImpact": "Minor service latency.",
+      "recommendedResponse": "Enforce strict API key quotas.",
+      "futurePrevention": [
+        "Implement Token Bucket rate limiting."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1009",
+    "title": "Warehouse IoT Hub Botnet Malware Beacon",
+    "severity": "Critical",
+    "status": "Active",
+    "sourceIp": "192.168.50.100",
+    "destination": "iot-sensor-hub-warehouse",
+    "deviceName": "iot-sensor-hub-warehouse",
+    "deviceId": "DEV-1009",
+    "detectedAt": "07:45 AM (Just now)",
+    "protocol": "TCP (8443)",
+    "riskScore": 94,
+    "description": "Embedded IoT device sending encrypted command & control (C2) heartbeat pulses to malicious external host.",
+    "businessImpacts": [
+      "IoT device hijacked into botnet cluster",
+      "Warehouse telemetry sensor tampering"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Quarantine warehouse IoT hub device from main subnet",
+        "completed": false
+      },
+      {
+        "id": "act-2",
+        "text": "Block outbound connection to C2 domain on gateway firewall",
+        "completed": false
+      }
+    ],
+    "timeline": [
+      {
+        "time": "07:40 AM",
+        "title": "Unusual egress traffic",
+        "desc": "Outbound connection to untrusted IP"
+      },
+      {
+        "time": "07:45 AM",
+        "title": "Device Isolated",
+        "desc": "VLAN quarantine rule applied"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Device infected with Mirai-variant malware communicating with C2 server.",
+      "businessImpact": "Supply chain telemetry disruptions.",
+      "recommendedResponse": "Isolate device and re-flash firmware image.",
+      "futurePrevention": [
+        "Segment IoT devices into isolated VLANs."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1010",
+    "title": "CI/CD Build Runner Cache Routine Audit",
+    "severity": "Low",
+    "status": "Active",
+    "sourceIp": "10.0.8.12",
+    "destination": "dev-jenkins-ci-worker",
+    "deviceName": "dev-jenkins-ci-worker",
+    "deviceId": "DEV-1010",
+    "detectedAt": "12:00 PM (3 mins ago)",
+    "protocol": "HTTPS (8080)",
+    "riskScore": 15,
+    "description": "Automated Jenkins worker cache purge executed as part of routine maintenance schedule.",
+    "businessImpacts": [
+      "Temporary build container initialization delay"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Re-warm CI build cache",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "12:00 PM",
+        "title": "Routine Cache Purge",
+        "desc": "Completed successfully"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Standard maintenance operation.",
+      "businessImpact": "None.",
+      "recommendedResponse": "No action needed.",
+      "futurePrevention": [
+        "Routine monitoring."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1011",
+    "title": "VPN Connection Handshake Retry Notice",
+    "severity": "Low",
+    "status": "Under Investigation",
+    "sourceIp": "172.16.0.1",
+    "destination": "vpn-concentrator-east",
+    "deviceName": "vpn-concentrator-east",
+    "deviceId": "DEV-1011",
+    "detectedAt": "12:45 PM (Just now)",
+    "protocol": "IPsec / IKEv2",
+    "riskScore": 18,
+    "description": "Transient packet loss caused single VPN client tunnel renegotiation retry.",
+    "businessImpacts": [
+      "Brief 2-second tunnel reconnect delay"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Handshake re-established automatically",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "12:45 PM",
+        "title": "Tunnel Restored",
+        "desc": "Session active"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Transient network jitter.",
+      "businessImpact": "None.",
+      "recommendedResponse": "No action needed.",
+      "futurePrevention": [
+        "Monitor ISP tunnel latency."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1012",
+    "title": "Inactive SFTP Session Connection Timeout",
+    "severity": "Low",
+    "status": "Action Taken",
+    "sourceIp": "10.0.15.22",
+    "destination": "partner-sftp-01",
+    "deviceName": "partner-sftp-01",
+    "deviceId": "DEV-1012",
+    "detectedAt": "13:10 PM (45 mins ago)",
+    "protocol": "SFTP (22)",
+    "riskScore": 12,
+    "description": "Idle SFTP partner connection disconnected after 30 minutes of inactivity.",
+    "businessImpacts": [
+      "Resource release on SFTP daemon"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Session closed gracefully",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "13:10 PM",
+        "title": "Idle disconnect enforced",
+        "desc": "Connection dropped"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Standard idle timeout compliance rule.",
+      "businessImpact": "None.",
+      "recommendedResponse": "No action needed.",
+      "futurePrevention": [
+        "Enforce 15-minute idle timeouts."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1013",
+    "title": "Outbound Email Queue Backlog Notice",
+    "severity": "Low",
+    "status": "Active",
+    "sourceIp": "10.0.2.14",
+    "destination": "mail-exchange-relay",
+    "deviceName": "mail-exchange-relay",
+    "deviceId": "DEV-1013",
+    "detectedAt": "13:50 PM (Just now)",
+    "protocol": "SMTP (25)",
+    "riskScore": 22,
+    "description": "Temporary mail queue spike during corporate announcement broadcast.",
+    "businessImpacts": [
+      "Minor email delivery delay under 1 minute"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Mail queue processed cleanly",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "13:50 PM",
+        "title": "Queue Flushed",
+        "desc": "All emails delivered"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Expected outbound mail spike.",
+      "businessImpact": "None.",
+      "recommendedResponse": "No action required.",
+      "futurePrevention": [
+        "Rate-limit bulk internal email distributions."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1014",
+    "title": "Unauthenticated Kubelet API Exploit",
+    "severity": "Critical",
+    "status": "Active",
+    "sourceIp": "10.0.9.33",
+    "destination": "staging-k8s-worker-03",
+    "deviceName": "staging-k8s-worker-03",
+    "deviceId": "DEV-1014",
+    "detectedAt": "16:05 PM (Just now)",
+    "protocol": "HTTPS (10250)",
+    "riskScore": 97,
+    "description": "Remote execution attempt via unauthenticated Kubernetes Kubelet API endpoint.",
+    "businessImpacts": [
+      "Cluster-wide container compromise and node takeover"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Disable Anonymous Authentication (--anonymous-auth=false) on Kubelet",
+        "completed": false
+      },
+      {
+        "id": "act-2",
+        "text": "Enable Webhook authorization mode for node API",
+        "completed": false
+      }
+    ],
+    "timeline": [
+      {
+        "time": "16:00 PM",
+        "title": "Kubelet API exec request",
+        "desc": "/exec/pod command sent"
+      },
+      {
+        "time": "16:05 PM",
+        "title": "Node Isolated",
+        "desc": "Kubernetes network policy isolation"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Misconfigured Kubelet API port 10250 permitting unauthenticated exec commands.",
+      "businessImpact": "Total control over staging cluster pods.",
+      "recommendedResponse": "Disable anonymous Kubelet auth immediately.",
+      "futurePrevention": [
+        "Enforce CIS Kubernetes Benchmarks."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1015",
+    "title": "DNS Tunneling Data Exfiltration",
+    "severity": "High",
+    "status": "Active",
+    "sourceIp": "10.0.12.80",
+    "destination": "rd-ml-training-node-gpu",
+    "deviceName": "rd-ml-training-node-gpu",
+    "deviceId": "DEV-1015",
+    "detectedAt": "15:40 PM (1 min ago)",
+    "protocol": "DNS (53)",
+    "riskScore": 87,
+    "description": "Anomalous DNS TXT record queries sending base64 encoded data chunks to external server.",
+    "businessImpacts": [
+      "Intellectual property and ML model data leakage"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Block domain ns1.tunnel-dns-exfil.org at recursive DNS resolvers",
+        "completed": true
+      },
+      {
+        "id": "act-2",
+        "text": "Inspect DEV-1015 active processes for iodined/dnscat2 utilities",
+        "completed": false
+      }
+    ],
+    "timeline": [
+      {
+        "time": "15:35 PM",
+        "title": "High entropy DNS queries",
+        "desc": "1,500 TXT record lookups"
+      },
+      {
+        "time": "15:40 PM",
+        "title": "Domain Blacklisted",
+        "desc": "DNS resolver dropped requests"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "DNS tunneling utility bypassing standard firewall protocol inspection.",
+      "businessImpact": "Exfiltration of proprietary machine learning weights.",
+      "recommendedResponse": "Kill malicious process and sinkhole DNS domain.",
+      "futurePrevention": [
+        "Enforce DNS inspection at perimeter gateway."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1016",
+    "title": "Kerberos TGT Renewal Log Audit",
+    "severity": "Low",
+    "status": "Active",
+    "sourceIp": "10.0.0.10",
+    "destination": "corp-active-directory-dc1",
+    "deviceName": "corp-active-directory-dc1",
+    "deviceId": "DEV-1016",
+    "detectedAt": "14:15 PM (Just now)",
+    "protocol": "Kerberos (88)",
+    "riskScore": 14,
+    "description": "Routine Kerberos ticket-granting-ticket (TGT) request logged during user domain login.",
+    "businessImpacts": [
+      "Normal domain controller operation"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Audited Kerberos auth log",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "14:15 PM",
+        "title": "TGT Granted",
+        "desc": "Standard domain authentication"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Valid domain user authentication.",
+      "businessImpact": "None.",
+      "recommendedResponse": "No action needed.",
+      "futurePrevention": [
+        "Enforce 10-hour TGT lifetimes."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1017",
+    "title": "Non-Standard Analytics Port Probe",
+    "severity": "Low",
+    "status": "Under Investigation",
+    "sourceIp": "10.0.20.44",
+    "destination": "analytics-worker-02",
+    "deviceName": "analytics-worker-02",
+    "deviceId": "DEV-1017",
+    "detectedAt": "14:40 PM (Just now)",
+    "protocol": "TCP (9092)",
+    "riskScore": 24,
+    "description": "Internal health check probe querying Kafka metrics port 9092.",
+    "businessImpacts": [
+      "Expected health check telemetry"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Health check request validated",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "14:40 PM",
+        "title": "Health Check OK",
+        "desc": "HTTP 200 returned"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Prometheus exporter scraping metrics.",
+      "businessImpact": "None.",
+      "recommendedResponse": "No action needed.",
+      "futurePrevention": [
+        "Maintain metric endpoint TLS auth."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1018",
+    "title": "Browser Extension Permission Warning",
+    "severity": "Low",
+    "status": "Under Investigation",
+    "sourceIp": "192.168.4.88",
+    "destination": "workstation-lead-architect",
+    "deviceName": "workstation-lead-architect",
+    "deviceId": "DEV-1018",
+    "detectedAt": "15:00 PM (Just now)",
+    "protocol": "Local Agent",
+    "riskScore": 28,
+    "description": "Developer workstation installed new browser extension with broad DOM access privileges.",
+    "businessImpacts": [
+      "Potential web data reading risk"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Extension reviewed and approved by SecOps",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "15:00 PM",
+        "title": "Extension Approved",
+        "desc": "Added to developer allowlist"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Legitimate developer tooling extension.",
+      "businessImpact": "Low.",
+      "recommendedResponse": "Maintain browser extension policy.",
+      "futurePrevention": [
+        "Enforce enterprise Chrome extension policies."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1019",
+    "title": "SSL Certificate Expiration Reminder",
+    "severity": "Low",
+    "status": "Action Taken",
+    "sourceIp": "10.0.1.5",
+    "destination": "edge-loadbalancer",
+    "deviceName": "edge-loadbalancer",
+    "deviceId": "DEV-1019",
+    "detectedAt": "15:30 PM (Just now)",
+    "protocol": "HTTPS (443)",
+    "riskScore": 10,
+    "description": "Wildcard SSL certificate on edge loadbalancer set to expire in 45 days.",
+    "businessImpacts": [
+      "Preventative certificate maintenance alert"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Triggered automated Let's Encrypt renewal pipeline",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "15:30 PM",
+        "title": "Cert Auto-Renewed",
+        "desc": "Valid for next 90 days"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Automated certificate management notification.",
+      "businessImpact": "None.",
+      "recommendedResponse": "Certificate updated automatically.",
+      "futurePrevention": [
+        "Use automated ACME protocol cert renewals."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1020",
+    "title": "Exposed RDP Port 3389 External Probe",
+    "severity": "High",
+    "status": "Active",
+    "sourceIp": "10.0.5.101",
+    "destination": "legacy-payment-v1",
+    "deviceName": "legacy-payment-v1",
+    "deviceId": "DEV-1020",
+    "detectedAt": "13:22 PM (Just now)",
+    "protocol": "RDP (3389)",
+    "riskScore": 86,
+    "description": "Legacy payment system probed for exposed Remote Desktop Protocol (RDP) vulnerabilities.",
+    "businessImpacts": [
+      "Unencrypted administrative access risk on legacy OS"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Close public internet facing port 3389 on gateway router",
+        "completed": false
+      },
+      {
+        "id": "act-2",
+        "text": "Require VPN authentication for all RDP connections",
+        "completed": false
+      }
+    ],
+    "timeline": [
+      {
+        "time": "13:18 PM",
+        "title": "RDP connection request",
+        "desc": "Unauthenticated handshake on port 3389"
+      },
+      {
+        "time": "13:22 PM",
+        "title": "Port Closed",
+        "desc": "Firewall rule updated"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Internet scanners targeting default RDP port.",
+      "businessImpact": "High risk due to unpatched legacy OS.",
+      "recommendedResponse": "Disable public RDP access immediately.",
+      "futurePrevention": [
+        "Migrate payment workloads to supported OS."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1021",
+    "title": "SIP UDP Packet Flood Warning",
+    "severity": "Low",
+    "status": "Active",
+    "sourceIp": "192.168.2.10",
+    "destination": "voip-telephony-sip-server",
+    "deviceName": "voip-telephony-sip-server",
+    "deviceId": "DEV-1021",
+    "detectedAt": "16:10 PM (Just now)",
+    "protocol": "SIP (5060)",
+    "riskScore": 26,
+    "description": "VoIP SIP gateway received high traffic volume during company all-hands audio call.",
+    "businessImpacts": [
+      "High UDP bandwidth utilization"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "QoS bandwidth prioritization enforced for SIP traffic",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "16:10 PM",
+        "title": "QoS Policy Active",
+        "desc": "Audio quality maintained"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "High legitimate call volume during internal company presentation.",
+      "businessImpact": "None.",
+      "recommendedResponse": "Maintain QoS policies.",
+      "futurePrevention": [
+        "Provision additional SIP trunk capacity."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1022",
+    "title": "Unauthorized Subnet Port Scanning",
+    "severity": "Medium",
+    "status": "Active",
+    "sourceIp": "192.168.100.45",
+    "destination": "workstation-contractor-temp",
+    "deviceName": "workstation-contractor-temp",
+    "deviceId": "DEV-1022",
+    "detectedAt": "08:30 AM (5 mins ago)",
+    "resolvedAt": "08:45 AM",
+    "protocol": "TCP (Nmap)",
+    "riskScore": 55,
+    "description": "Sequential SYN packet sweep across internal 192.168.0.0/16 subnet originating from contractor laptop.",
+    "businessImpacts": [
+      "Internal network mapping by unauthorized host"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Isolate scanning host workstation from corporate LAN",
+        "completed": true
+      },
+      {
+        "id": "act-2",
+        "text": "Verify state of internal subnet micro-segmentation firewalls",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "08:25 AM",
+        "title": "Port scan detected",
+        "desc": "500 ports scanned in 10 seconds"
+      },
+      {
+        "time": "08:30 AM",
+        "title": "Network Access Revoked",
+        "desc": "Host quarantined from LAN"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Contractor machine running automated reconnaissance tool.",
+      "businessImpact": "Subnet topology discovery.",
+      "recommendedResponse": "Revoke contractor network access.",
+      "futurePrevention": [
+        "Enforce 802.1X Network Access Control (NAC)."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1023",
+    "title": "Ransomware File Encryption Attempt",
+    "severity": "Critical",
+    "status": "Active",
+    "sourceIp": "10.0.0.250",
+    "destination": "nas-backup-storage-01",
+    "deviceName": "nas-backup-storage-01",
+    "deviceId": "DEV-1023",
+    "detectedAt": "11:50 AM (Just now)",
+    "protocol": "SMB (445)",
+    "riskScore": 99,
+    "description": "High-velocity file modification and renaming detected on backup storage volume.",
+    "businessImpacts": [
+      "Irreversible data loss on backup storage"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Immediately isolate NAS storage server network interface",
+        "completed": false
+      },
+      {
+        "id": "act-2",
+        "text": "Kill process PID 8812 (crypto_svc.exe) across target endpoints",
+        "completed": false
+      }
+    ],
+    "timeline": [
+      {
+        "time": "11:45 AM",
+        "title": "Mass file renaming detected",
+        "desc": ".locked extension appended to files"
+      },
+      {
+        "time": "11:50 AM",
+        "title": "Port Blocked",
+        "desc": "SMB traffic halted"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Active ransomware payload encrypting shared NAS files.",
+      "businessImpact": "Catastrophic backup destruction risk.",
+      "recommendedResponse": "Isolate storage host and mount air-gapped snapshots.",
+      "futurePrevention": [
+        "Enforce immutable WORM backup storage."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1024",
+    "title": "Printer Spooler Service Offline Notice",
+    "severity": "Low",
+    "status": "Active",
+    "sourceIp": "192.168.1.200",
+    "destination": "print-server-headquarters",
+    "deviceName": "print-server-headquarters",
+    "deviceId": "DEV-1024",
+    "detectedAt": "16:45 PM (2 hours ago)",
+    "protocol": "CUPS (631)",
+    "riskScore": 15,
+    "description": "CUPS print daemon restarted due to paper tray jam alert.",
+    "businessImpacts": [
+      "Temporary office printing pause"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Print daemon service restarted",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "16:45 PM",
+        "title": "Service Restored",
+        "desc": "Print jobs processing"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Hardware maintenance event.",
+      "businessImpact": "None.",
+      "recommendedResponse": "No action needed.",
+      "futurePrevention": [
+        "Monitor print queue status."
+      ]
+    }
+  },
+  {
+    "id": "TRT-1025",
+    "title": "Log Collector Disk Utilization Alert",
+    "severity": "Low",
+    "status": "Under Investigation",
+    "sourceIp": "10.0.10.12",
+    "destination": "security-siem-collector",
+    "deviceName": "security-siem-collector",
+    "deviceId": "DEV-1025",
+    "detectedAt": "17:15 PM (Just now)",
+    "protocol": "Syslog (514)",
+    "riskScore": 22,
+    "description": "SIEM log collector partition reached 75% storage capacity threshold.",
+    "businessImpacts": [
+      "Preventative log storage rotation warning"
+    ],
+    "recommendedActions": [
+      {
+        "id": "act-1",
+        "text": "Archived old audit logs to cold S3 bucket",
+        "completed": true
+      }
+    ],
+    "timeline": [
+      {
+        "time": "17:15 PM",
+        "title": "Disk Space Reclaimed",
+        "desc": "Capacity down to 35%"
+      }
+    ],
+    "aiAnalysis": {
+      "explanation": "Routine log retention lifecycle event.",
+      "businessImpact": "None.",
+      "recommendedResponse": "Logs offloaded to long-term storage.",
+      "futurePrevention": [
+        "Enforce automated log compression."
+      ]
+    }
+  }
+]

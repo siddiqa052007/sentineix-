@@ -1,0 +1,52 @@
+[
+  {
+    "id": "ALT-9001",
+    "title": "SQL Injection Attack Intercepted",
+    "timestamp": "10:14 AM",
+    "severity": "Critical",
+    "source": "192.168.1.105",
+    "description": "UNION SELECT payload dropped by eBPF firewall kernel probe.",
+    "read": false,
+    "threatId": "TRT-1001"
+  },
+  {
+    "id": "ALT-9002",
+    "title": "Brute Force Threshold Exceeded",
+    "timestamp": "10:20 AM",
+    "severity": "Critical",
+    "source": "192.168.1.24",
+    "description": "140 login failures/sec on /api/auth endpoint.",
+    "read": false,
+    "threatId": "TRT-1004"
+  },
+  {
+    "id": "ALT-9003",
+    "title": "C2 Malware Beacon Detected",
+    "timestamp": "10:05 AM",
+    "severity": "Critical",
+    "source": "192.168.50.100",
+    "description": "Cobalt Strike JARM TLS fingerprint matched on IoT Gateway.",
+    "read": false,
+    "threatId": "TRT-1005"
+  },
+  {
+    "id": "ALT-9004",
+    "title": "Ransomware Mass Write Anomaly",
+    "timestamp": "10:28 AM",
+    "severity": "Critical",
+    "source": "10.0.0.250",
+    "description": "4,200 file modifications/sec flagged on SMB backup share.",
+    "read": false,
+    "threatId": "TRT-1008"
+  },
+  {
+    "id": "ALT-9005",
+    "title": "Port Sweep Internal Reconnaissance",
+    "timestamp": "09:45 AM",
+    "severity": "Medium",
+    "source": "192.168.100.45",
+    "description": "Nmap stealth SYN sweep across RFC1918 subnets.",
+    "read": true,
+    "threatId": "TRT-1002"
+  }
+]

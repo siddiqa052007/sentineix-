@@ -1,0 +1,8 @@
+{
+  "name": "SentinelX - AI Intrusion Detection System",
+  "description": "AI Powered Intrusion Detection System (IDS) for cybersecurity monitoring, threat detection, and network analysis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
